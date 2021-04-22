@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 
+/**
+ * Clickable image that naviges to a specified link.
+ * @param {object} props props passed from parent
+ */
 const NavImage = props => {
 	const history = useHistory();
 	return <img alt={props.alt} src={props.src} onClick={() => history.push(props.to)} />;

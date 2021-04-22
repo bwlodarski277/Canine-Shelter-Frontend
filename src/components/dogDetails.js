@@ -63,6 +63,7 @@ export class DogDetails extends Component {
 						</Sider>
 					</Layout>
 				</Card>
+				{/* TODO: Add the favourite button here */}
 			</section>
 		);
 	}

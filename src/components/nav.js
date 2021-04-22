@@ -1,37 +1,47 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { Menu } from 'antd';
+import UserContext from '../contexts/user';
+const { Item } = Menu;
 
-const Nav = props => {
-	const { loggedIn } = props;
-	const userText = loggedIn ? 'Account' : 'Log In';
+/**
+ * Navigation component.
+ */
+const Nav = () => {
+	const context = useContext(UserContext);
 	return (
 		<>
 			<h1 className="title">Canine Shelter</h1>
 			<Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
-				<Menu.Item key="1">
+				<Item key="1">
 					<Link to="/">Home</Link>
-				</Menu.Item>
-				<Menu.Item key="2">
+				</Item>
+				<Item key="2">
 					<Link to="/dogs">Dogs</Link>
-				</Menu.Item>
-				<Menu.Item key="3">
+				</Item>
+				<Item key="3">
 					<Link to="/breeds">Breeds</Link>
-				</Menu.Item>
-				<Menu.Item key="4">
+				</Item>
+				<Item key="4">
 					<Link to="/shelters">Shelters</Link>
-				</Menu.Item>
-				<Menu.Item key="5" style={{ float: 'right' }}>
-					{userText}
-				</Menu.Item>
+				</Item>
+				{context.loggedIn ? (
+					<Item key="5" style={{ float: 'right' }}>
+						<Link to="/account">Account</Link>
+					</Item>
+				) : (
+					<>
+						<Item key="5" style={{ float: 'right' }}>
+							<Link to="/login">Log In</Link>
+						</Item>
+						<Item key="6" style={{ float: 'right' }}>
+							<Link to="/register">Register</Link>
+						</Item>
+					</>
+				)}
 			</Menu>
 		</>
 	);
-};
-
-Nav.propTypes = {
-	loggedIn: PropTypes.bool
 };
 
 export default Nav;
