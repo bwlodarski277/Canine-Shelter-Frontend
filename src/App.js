@@ -2,8 +2,8 @@ import './App.css';
 import Nav from './components/nav';
 
 import React, { Component } from 'react';
-import { Layout } from 'antd';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Layout, message } from 'antd';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
 import Home from './components/home';
@@ -14,6 +14,8 @@ import UserContext from './contexts/user';
 import Login from './components/login';
 import { json, status } from './helpers/fetch';
 import maxAge from './utilities/cookieAge';
+import Register from './components/register';
+import Account from './components/account';
 
 const { Header, Content, Footer } = Layout;
 
@@ -24,11 +26,14 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			redirect: false,
 			user: {},
 			loggedIn: false,
 			cookies: new Cookies()
 		};
 		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
+		this.setUser = this.setUser.bind(this);
 	}
 
 	componentDidMount() {
@@ -56,6 +61,7 @@ class App extends Component {
 				const { cookies } = this.state;
 				cookies.set('jwt', jwt.token, { path: '/', maxAge: maxAge(jwt.exp) });
 				cookies.set('refresh', refresh.token, { path: '/', maxAge: maxAge(refresh.exp) });
+				this.loginJwt(jwt.token);
 			})
 			.catch(error => console.error(error));
 	}
@@ -71,7 +77,9 @@ class App extends Component {
 			.then(status)
 			.then(json)
 			.then(user => {
-				fetch(user.links.user, { headers: { Authorization: 'Bearer ' + jwt } })
+				fetch(user.links.user, {
+					headers: { Authorization: 'Bearer ' + jwt }
+				})
 					.then(status)
 					.then(json)
 					.then(userData => {
@@ -106,17 +114,70 @@ class App extends Component {
 			});
 	}
 
+	logout() {
+		const { cookies } = this.state;
+		cookies.remove('jwt');
+		cookies.remove('refresh');
+		this.setState({ user: {}, loggedIn: false, redirect: true });
+	}
+
+	setUser(data) {
+		const jwt = this.state.cookies.get('jwt');
+		const { user } = this.state;
+		// Update values in the user object
+		Object.keys(data).map(key => {
+			if (data[key]) user[key] = data[key];
+		});
+		// Extracting values that should not be changed
+		const {
+			dateCreated,
+			dateModified,
+			links,
+			modified,
+			provider,
+			role,
+			id,
+			confirm,
+			...updateFields
+		} = user;
+		// Post new data
+		fetch(user.links.self, {
+			method: 'PUT',
+			headers: {
+				Authorization: 'Bearer ' + jwt,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(updateFields)
+		})
+			.then(status)
+			.then(() => {
+				// Update user state
+				this.setState({ user });
+				message.success('Profile updated successfully');
+			})
+			.catch(error => {
+				message.error('Something went wrong!\n' + error.message);
+				console.error(error);
+			});
+	}
+
 	render() {
 		const context = {
 			user: this.state.user,
+			setUser: this.setUser,
 			jwt: this.state.cookies.get('jwt'),
 			loggedIn: this.state.loggedIn,
-			login: this.login
+			login: this.login,
+			logout: this.logout
 		};
+
+		const { redirect } = this.state;
+		if (this.state.redirect) this.setState({ redirect: false });
 
 		return (
 			<UserContext.Provider value={context}>
 				<Router>
+					{redirect && <Redirect to="/" />}
 					<Layout className="layout" style={{ minHeight: '100vh' }}>
 						{/* Navbar */}
 						<Header>
@@ -131,8 +192,8 @@ class App extends Component {
 								<Route path="/beeds" />
 								<Route path="/shelters" />
 								<Route path="/login" component={Login} />
-								<Route path="/register" />
-								<Route path="/account" />
+								<Route path="/register" component={Register} />
+								<Route path="/account" component={Account} />
 								<Route path="/" exact={true} component={Home} />
 							</Switch>
 						</Content>
