@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card } from 'antd';
+import { Card, notification } from 'antd';
 
 import noImage from '../images/noImage.jpg';
 import NavImage from './navImage';
@@ -29,7 +29,13 @@ class DogCard extends Component {
 	render() {
 		const { dog } = this.props;
 		const image = dog.imageUrl ? dog.imageUrl : noImage;
-		const onClick = this.context.loggedIn ? this.onClick : null;
+		const onClick = this.context.loggedIn
+			? this.onClick
+			: () =>
+					notification.open({
+						message: 'Log in',
+						description: 'Please log in to perform this action.'
+					});
 		return (
 			<>
 				<Card
