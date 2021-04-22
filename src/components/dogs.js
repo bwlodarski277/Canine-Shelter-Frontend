@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { json, status } from '../helpers/fetch';
-import { Col, Row } from 'antd';
+import { Col, Row, Pagination, Input, Empty } from 'antd';
+const { Search } = Input;
 import DogCard from './dogCard';
 import UserContext from '../contexts/user';
 
@@ -11,19 +12,30 @@ class Dogs extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dogs: []
+			dogs: [],
+			count: 0,
+			currentPage: 1,
+			pageSize: 4,
+			query: ''
 		};
 		this.updateFavs = this.updateFavs.bind(this);
 		this.getDogFavs = this.getDogFavs.bind(this);
 		this.getUserFavs = this.getUserFavs.bind(this);
+		this.changePageSize = this.changePageSize.bind(this);
+		this.fetchData = this.fetchData.bind(this);
+		this.updateSearch = this.updateSearch.bind(this);
 	}
 
 	async componentDidMount() {
+		await this.fetchData();
+	}
+
+	async fetchData() {
 		try {
-			let dogs = await this.getDogs();
+			let { dogs, count } = await this.getDogs();
 			dogs = await this.getDogFavs(dogs);
 			if (this.context.loggedIn) dogs = await this.getUserFavs(dogs);
-			this.setState({ dogs });
+			this.setState({ dogs, count });
 		} catch (error) {
 			console.error(error);
 		}
@@ -35,7 +47,9 @@ class Dogs extends Component {
 			['select', 'name'],
 			['select', 'description'],
 			['select', 'imageUrl'],
-			['limit', '1']
+			['page', this.state.currentPage],
+			['limit', this.state.pageSize],
+			['query', this.state.query]
 		];
 		// Getting list of dogs
 		url.search = new URLSearchParams(params);
@@ -140,15 +154,51 @@ class Dogs extends Component {
 		}
 	}
 
+	async componentDidUpdate(prevProps, prevState) {
+		const { pageSize, currentPage, query } = prevState;
+		const { state } = this;
+		if (
+			pageSize !== state.pageSize ||
+			currentPage !== state.currentPage ||
+			query !== state.query
+		)
+			await this.fetchData();
+	}
+
+	changePageSize(page, pageSize) {
+		this.setState({ currentPage: page, pageSize });
+	}
+
+	updateSearch(value) {
+		this.setState({ query: value });
+	}
+
 	render() {
-		if (!this.state.dogs.length) return <h2>Loading dogs...</h2>;
-		const { dogs } = this.state;
-		const list = dogs.map(dog => (
+		const { dogs, count, currentPage } = this.state;
+		let list = dogs.map(dog => (
 			<Col key={dog.id} span={6}>
 				<DogCard dog={dog} onClick={this.updateFavs} />
 			</Col>
 		));
-		return <Row>{list}</Row>;
+		if (!list.length) list = <Empty style={{ margin: 'auto' }} />;
+		return (
+			<>
+				<section style={{ maxWidth: '600px', margin: 'auto' }}>
+					<Search allowClear placeholder="Search" onSearch={this.updateSearch} />
+				</section>
+				<Row style={{ minHeight: '70vh' }}>{list}</Row>
+				<span style={{ textAlign: 'center' }}>
+					<Pagination
+						defaultCurrent={currentPage}
+						total={count}
+						showSizeChanger
+						onChange={this.changePageSize}
+						pageSizeOptions={[4, 8, 16]}
+						defaultPageSize={4}
+					/>
+				</span>
+			</>
+		);
 	}
 }
 
