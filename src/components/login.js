@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Form, Input } from 'antd';
+import { Button, Card, Divider, Form, Input, message } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { Component } from 'react';
 
@@ -37,13 +37,12 @@ class Login extends Component {
 					.then(userData => {
 						userData.password = password;
 						this.context.login(userData);
-						console.log(user);
-					})
-					.catch(error => console.error(error));
+						message.success('Logged in');
+					});
 			})
 			.catch(error => {
+				message.error('Invalid username or password');
 				console.error(error);
-				this.setState({ error });
 			});
 	}
 
