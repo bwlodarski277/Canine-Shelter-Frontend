@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu } from 'antd';
+import { Avatar, Menu } from 'antd';
 import UserContext from '../contexts/user';
 const { Item } = Menu;
 
@@ -27,7 +27,10 @@ const Nav = () => {
 				</Item>
 				{context.loggedIn ? (
 					<Item key="5" style={{ float: 'right' }}>
-						<Link to="/account">Account</Link>
+						<Link to="/account">
+							<Avatar style={{ marginRight: '15px' }} src={context.user.imageUrl} />
+							Account
+						</Link>
 					</Item>
 				) : (
 					<>
