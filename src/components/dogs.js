@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { json, status } from '../helpers/fetch';
-import { Col, Row, Pagination, Input, Empty } from 'antd';
-const { Search } = Input;
+import { Col, Row } from 'antd';
+import PropTypes from 'prop-types';
+import updateFavs from '../helpers/updateFavs';
 import DogCard from './dogCard';
 import UserContext from '../contexts/user';
+import SearchList from './searchList';
 
 /**
  * Dog grid component.
@@ -12,58 +14,56 @@ class Dogs extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dogs: [],
-			count: 0,
-			currentPage: 1,
-			pageSize: 4,
-			query: ''
+			context: this.props.context
 		};
-		this.updateFavs = this.updateFavs.bind(this);
-		this.getDogFavs = this.getDogFavs.bind(this);
-		this.getUserFavs = this.getUserFavs.bind(this);
-		this.changePageSize = this.changePageSize.bind(this);
+		this.getDogs = this.getDogs.bind(this);
 		this.fetchData = this.fetchData.bind(this);
-		this.updateSearch = this.updateSearch.bind(this);
+		this.getDogFavs = this.getDogFavs.bind(this);
 	}
 
-	async componentDidMount() {
-		await this.fetchData();
-	}
-
-	async fetchData() {
+	async fetchData(currentPage, pageSize, query, order, direction) {
 		try {
-			let { dogs, count } = await this.getDogs();
+			let { dogs, count } = await this.getDogs(
+				currentPage,
+				pageSize,
+				query,
+				order,
+				direction
+			);
 			dogs = await this.getDogFavs(dogs);
-			if (this.context.loggedIn) dogs = await this.getUserFavs(dogs);
-			this.setState({ dogs, count });
+			if (this.state.context.loggedIn) dogs = await this.getUserFavs(dogs);
+			return { list: dogs, count };
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	async getDogs() {
+	async getDogs(currentPage, pageSize, query, order, direction) {
 		const url = new URL('http://localhost:3000/api/v1/dogs');
 		const params = [
 			['select', 'name'],
 			['select', 'description'],
 			['select', 'imageUrl'],
-			['page', this.state.currentPage],
-			['limit', this.state.pageSize],
-			['query', this.state.query]
+			['page', currentPage],
+			['limit', pageSize],
+			['query', query],
+			['order', order],
+			['direction', direction]
 		];
 		// Getting list of dogs
 		url.search = new URLSearchParams(params);
 		// Getting the dogs
-		const res = await fetch(url);
+		const res = await fetch(url, { cache: 'no-cache' });
 		const data = await status(res);
-		const dogs = await json(data);
-		return dogs;
+		const { dogs, count } = await json(data);
+		return { dogs, count };
 	}
 
 	async getUserFavs(dogs) {
-		const { user, jwt } = this.context;
+		const { user, jwt } = this.props.context;
 		const res = await fetch(user.links.favourites, {
-			headers: { Authorization: 'Bearer ' + jwt }
+			headers: { Authorization: 'Bearer ' + jwt },
+			cache: 'no-cache' // Still caching but asking API if data has changed
 		});
 		const data = await status(res);
 		const favs = await json(data);
@@ -88,7 +88,8 @@ class Dogs extends Component {
 		const dogFavs = await Promise.all(
 			dogs.map(async dog => {
 				try {
-					const res = await fetch(dog.links.favourites);
+					// Still caching but asking API if data has changed
+					const res = await fetch(dog.links.favourites, { cache: 'no-cache' });
 					const data = await status(res);
 					const favs = await json(data);
 					dog.favourites = favs.count;
@@ -101,107 +102,47 @@ class Dogs extends Component {
 		return dogFavs;
 	}
 
-	updateFavs(id) {
-		const { user, jwt } = this.context;
-		const idx = this.state.dogs.findIndex(dog => dog.id === id);
-		if (idx !== -1) {
-			const { dogs } = this.state;
-			// if favourited, find favourite ID and delete.
-			if (dogs[idx].favourited)
-				// Get favourites
-				fetch(user.links.favourites, {
-					headers: { Authorization: 'Bearer ' + jwt }
-				})
-					.then(status)
-					.then(json)
-					// Find favourite with the same dog ID
-					.then(favs => {
-						const {
-							links: { self }
-						} = favs.find(fav => fav.dogId === id);
-						// Delete dog
-						fetch(self, {
-							method: 'DELETE',
-							headers: { Authorization: 'Bearer ' + jwt }
-						})
-							// Decrement number
-							.then(status)
-							.then(() => {
-								dogs[idx].favourites--;
-								dogs[idx].favourited = !dogs[idx].favourited;
-								this.setState({ dogs });
-								console.log('Favourite removed');
-							})
-							.catch(error => console.error(error));
-					})
-					.catch(error => console.error(error));
-			// Add a new favourite
-			else
-				fetch(user.links.favourites, {
-					method: 'POST',
-					headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
-					body: JSON.stringify({ dogId: id })
-				})
-					// Update number
-					.then(status)
-					.then(() => {
-						dogs[idx].favourites++;
-						dogs[idx].favourited = !dogs[idx].favourited;
-						this.setState({ dogs });
-						console.log('Favourite added');
-					})
-					.catch(error => console.error(error));
-		}
-	}
-
-	async componentDidUpdate(prevProps, prevState) {
-		const { pageSize, currentPage, query } = prevState;
-		const { state } = this;
-		if (
-			pageSize !== state.pageSize ||
-			currentPage !== state.currentPage ||
-			query !== state.query
-		)
-			await this.fetchData();
-	}
-
-	changePageSize(page, pageSize) {
-		this.setState({ currentPage: page, pageSize });
-	}
-
-	updateSearch(value) {
-		this.setState({ query: value });
+	/**
+	 * Maps a list of dogs to a set of React components.
+	 * @param {*} dogs list of dogs passed to this function
+	 * @param {object} extraFuncs extra functions passed to component and bound to it
+	 * @returns React components
+	 */
+	listMapping(dogs, { updateFavs }) {
+		const list = dogs.map(dog => (
+			<Col key={dog.id} span={6}>
+				<DogCard dog={dog} onClick={updateFavs} />
+			</Col>
+		));
+		return <Row style={{ minHeight: '70vh' }}>{list}</Row>;
 	}
 
 	render() {
-		const { dogs, count, currentPage } = this.state;
-		let list = dogs.map(dog => (
-			<Col key={dog.id} span={6}>
-				<DogCard dog={dog} onClick={this.updateFavs} />
-			</Col>
-		));
-		if (!list.length) list = <Empty style={{ margin: 'auto' }} />;
+		const columns = ['name', 'description', 'age', 'gender', 'dateCreated', 'dateModified'];
 		return (
-			<>
-				<section style={{ maxWidth: '600px', margin: 'auto' }}>
-					<Search allowClear placeholder="Search" onSearch={this.updateSearch} />
-				</section>
-				<Row style={{ minHeight: '70vh' }}>{list}</Row>
-				<span style={{ textAlign: 'center' }}>
-					<Pagination
-						defaultCurrent={currentPage}
-						total={count}
-						showSizeChanger
-						onChange={this.changePageSize}
-						pageSizeOptions={[4, 8, 16]}
-						defaultPageSize={4}
-					/>
-				</span>
-			</>
+			<SearchList
+				pageSizeOptions={[4, 8, 12]}
+				defaultPageSize={4}
+				columns={columns}
+				fetchFunction={this.fetchData}
+				listMapping={this.listMapping}
+				extraFuncs={{ updateFavs }}
+			/>
 		);
+		// return <p>Test</p>;
 	}
 }
 
-Dogs.contextType = UserContext;
+Dogs.propTypes = {
+	context: PropTypes.object
+};
 
-export default Dogs;
+/**
+ * Dogs component wrapper
+ * Used to make sure the component gets up-to-date context
+ */
+const DogsWrapper = () => {
+	return <UserContext.Consumer>{context => <Dogs context={context} />}</UserContext.Consumer>;
+};
+
+export default DogsWrapper;
