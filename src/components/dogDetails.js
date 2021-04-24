@@ -20,7 +20,8 @@ export class DogDetails extends Component {
 
 	componentDidMount() {
 		const { id } = this.props.match.params;
-		fetch(`http://localhost:3000/api/v1/dogs/${id}`)
+		// Still caching but asking API if data has changed
+		fetch(`http://localhost:3000/api/v1/dogs/${id}`, { cache: 'no-cache' })
 			.then(status)
 			.then(json)
 			.then(data => this.setState({ dog: data }))
