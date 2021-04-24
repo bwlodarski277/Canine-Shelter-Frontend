@@ -30,14 +30,14 @@ class Login extends Component {
 			.then(json)
 			.then(user => {
 				fetch(user.links.user, {
-					headers: { Authorization: 'Basic ' + btoa(`${username}:${password}`) }
+					headers: { Authorization: 'Basic ' + btoa(`${username}:${password}`) },
+					cache: 'no-cache' // Still caching but asking API if data has changed
 				})
 					.then(status)
 					.then(json)
 					.then(userData => {
 						userData.password = password;
 						this.context.login(userData);
-						message.success('Logged in');
 					});
 			})
 			.catch(error => {
