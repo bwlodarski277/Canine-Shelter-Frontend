@@ -9,13 +9,15 @@ import Cookies from 'universal-cookie';
 import Home from './components/home';
 import IconCredit from './components/iconCredit';
 import Dogs from './components/dogs';
-import DogDetails from './components/dogDetails';
 import UserContext from './contexts/user';
 import Login from './components/login';
-import { json, status } from './helpers/fetch';
+import { error, json, status } from './helpers/fetch';
 import maxAge from './utilities/cookieAge';
 import Register from './components/register';
 import Account from './components/account';
+import Breeds from './components/breeds';
+import BreedDogs from './components/breedDogs';
+import { DogDetails } from './components/dogDetails';
 
 const { Header, Content, Footer } = Layout;
 
@@ -88,14 +90,11 @@ class App extends Component {
 					})
 					.catch(error => console.error(error));
 			})
-			.catch(error => {
-				console.error(error);
-				this.setState({ error });
-			});
+			.catch(error => console.error(error));
 	}
 
 	/**
-	 * Log in the user using basic authorization.
+	 * Log in the user using basic authorization, and store JWT.
 	 * @param {object} user user object returned from the DB
 	 */
 	login(user) {
@@ -111,35 +110,40 @@ class App extends Component {
 				cookies.set('jwt', jwt.token, { path: '/', maxAge: maxAge(jwt.exp) });
 				cookies.set('refresh', refresh.token, { path: '/', maxAge: maxAge(refresh.exp) });
 				this.setState({ user, loggedIn: true });
-			});
+				message.success('Logged in');
+			})
+			.catch(error);
 	}
 
-	logout() {
+	/**
+	 * Logs the user out and creates a message.
+	 * @param {boolean} [deleted] indicator for if account deleted message should be shown
+	 */
+	logout(deleted = false) {
 		const { cookies } = this.state;
 		cookies.remove('jwt');
 		cookies.remove('refresh');
 		this.setState({ user: {}, loggedIn: false, redirect: true });
+		if (deleted) message.success('Account deleted');
+		else message.success('Logged out');
 	}
 
-	setUser(data) {
+	/**
+	 * Updates the user's record and updates the data stored
+	 * @param {object} data data to update in the user record
+	 * @param {object} [form] form reference, for clearning the form that called this
+	 */
+	setUser(data, form) {
+		const { confirm, ...formData } = data;
 		const jwt = this.state.cookies.get('jwt');
 		const { user } = this.state;
-		// Update values in the user object
-		Object.keys(data).map(key => {
-			if (data[key]) user[key] = data[key];
+		const updateFields = {};
+		Object.keys(formData).map(key => {
+			if (data[key] !== undefined) {
+				user[key] = formData[key]; // Update values in the user object
+				updateFields[key] = formData[key]; // Filtering out fields that weren't set
+			}
 		});
-		// Extracting values that should not be changed
-		const {
-			dateCreated,
-			dateModified,
-			links,
-			modified,
-			provider,
-			role,
-			id,
-			confirm,
-			...updateFields
-		} = user;
 		// Post new data
 		fetch(user.links.self, {
 			method: 'PUT',
@@ -150,15 +154,14 @@ class App extends Component {
 			body: JSON.stringify(updateFields)
 		})
 			.then(status)
+			.then(json)
 			.then(() => {
 				// Update user state
 				this.setState({ user });
 				message.success('Profile updated successfully');
+				if (form) form.current.resetFields();
 			})
-			.catch(error => {
-				message.error('Something went wrong!\n' + error.message);
-				console.error(error);
-			});
+			.catch(err => json(err).then(error));
 	}
 
 	render() {
@@ -187,9 +190,10 @@ class App extends Component {
 						{/* Body of the website */}
 						<Content className="content">
 							<Switch>
+								<Route path="/breeds/:id" component={BreedDogs} />
+								<Route path="/breeds" component={Breeds} />
 								<Route path="/dogs/:id" component={DogDetails} />
 								<Route path="/dogs" component={Dogs} />
-								<Route path="/beeds" />
 								<Route path="/shelters" />
 								<Route path="/login" component={Login} />
 								<Route path="/register" component={Register} />
