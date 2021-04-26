@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Divider, Empty, Image, PageHeader } from 'antd';
 import noImage from '../images/noImage.jpg';
-import { json, status } from '../helpers/fetch';
+import { error, json, status } from '../helpers/fetch';
 import { withRouter } from 'react-router-dom';
 import Title from 'antd/lib/typography/Title';
 import Sider from 'antd/lib/layout/Sider';
@@ -25,12 +25,13 @@ export class DogDetails extends Component {
 			.then(status)
 			.then(json)
 			.then(data => this.setState({ dog: data }))
-			.catch(err => console.error(err));
+			.catch(error);
 	}
 
 	render() {
 		if (!this.state.dog) return <Empty />;
 		const dog = this.state.dog;
+		const image = dog.image ? image : '';
 		return (
 			<section style={{ maxWidth: '900px', margin: 'auto' }}>
 				<PageHeader title="Dog" onBack={() => this.props.history.goBack()} />
@@ -38,7 +39,7 @@ export class DogDetails extends Component {
 					<Layout>
 						<Content style={{ textAlign: 'center', backgroundColor: 'white' }}>
 							<Title>{dog.name}</Title>
-							<Image src={dog.imageUrl} fallback={noImage} width={400} />
+							<Image src={image} fallback={noImage} width={400} />
 						</Content>
 						<Sider theme="light">
 							<Title level={3}>About the dog</Title>
