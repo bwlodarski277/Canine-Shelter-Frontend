@@ -42,6 +42,11 @@ const Nav = () => {
 						</Item>
 					</>
 				)}
+				{context.user.role === 'staff' && (
+					<Item key="6" style={{ float: 'right' }}>
+						<Link to="/staffArea">Staff Area</Link>
+					</Item>
+				)}
 			</Menu>
 		</>
 	);
