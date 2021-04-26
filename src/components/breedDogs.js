@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { json, status } from '../helpers/fetch';
+import { error, json, status } from '../helpers/fetch';
 import { Col, Row } from 'antd';
 import PropTypes from 'prop-types';
-import updateFavs from '../helpers/updateFavs';
+import { updateFavs, getDogFavs, getUserFavs } from '../helpers/updateFavs';
 import DogCard from './dogCard';
 import UserContext from '../contexts/user';
 import SearchList from './searchList';
@@ -19,7 +19,6 @@ class BreedDogs extends Component {
 		};
 		this.getDogs = this.getDogs.bind(this);
 		this.fetchData = this.fetchData.bind(this);
-		this.getDogFavs = this.getDogFavs.bind(this);
 	}
 
 	async fetchData(currentPage, pageSize, query, order, direction) {
@@ -31,11 +30,16 @@ class BreedDogs extends Component {
 				order,
 				direction
 			);
-			dogs = await this.getDogFavs(dogs);
-			if (this.state.context.loggedIn) dogs = await this.getUserFavs(dogs);
+			// Insert favs
+			dogs = await getDogFavs(dogs);
+			// If logged in
+			if (this.state.context.loggedIn) {
+				const { user, jwt } = this.props.context;
+				dogs = await getUserFavs(dogs, user, jwt);
+			}
 			return { list: dogs, count };
-		} catch (error) {
-			console.error(error);
+		} catch (err) {
+			error(err);
 		}
 	}
 
@@ -59,49 +63,6 @@ class BreedDogs extends Component {
 		const data = await status(res);
 		const { dogs, count } = await json(data);
 		return { dogs, count };
-	}
-
-	async getUserFavs(dogs) {
-		const { user, jwt } = this.props.context;
-		const res = await fetch(user.links.favourites, {
-			headers: { Authorization: 'Bearer ' + jwt },
-			cache: 'no-cache' // Still caching but asking API if data has changed
-		});
-		const data = await status(res);
-		const favs = await json(data);
-
-		const favIds = favs.map(fav => fav.dogId);
-
-		const favouritedDogs = await Promise.all(
-			dogs.map(async dog => {
-				dog.favourited = favIds.includes(dog.id) ? true : false;
-				return dog;
-			})
-		);
-		return favouritedDogs;
-	}
-
-	/**
-	 * Injects favourite counts into dogs list
-	 * @returns {object} list of dogs with favourite data
-	 */
-	async getDogFavs(dogs) {
-		// Mapping favourite counts to each dog
-		const dogFavs = await Promise.all(
-			dogs.map(async dog => {
-				try {
-					// Still caching but asking API if data has changed
-					const res = await fetch(dog.links.favourites, { cache: 'no-cache' });
-					const data = await status(res);
-					const favs = await json(data);
-					dog.favourites = favs.count;
-					return dog;
-				} catch (error) {
-					console.log(error);
-				}
-			})
-		);
-		return dogFavs;
 	}
 
 	/**
