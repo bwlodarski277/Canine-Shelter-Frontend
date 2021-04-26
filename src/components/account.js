@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { ExclamationCircleFilled, UploadOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import UserContext from '../contexts/user';
-import { status } from '../helpers/fetch';
+import { error, status } from '../helpers/fetch';
 const { Item } = Form;
 const { confirm } = Modal;
 
@@ -49,8 +49,9 @@ const confirmRules = [
 	({ getFieldValue }) => ({
 		validator(rule, value) {
 			const password = getFieldValue('password');
-			if (password !== undefined && password !== value)
-				return Promise.reject('Passwords do not match');
+			if (password && value === undefined)
+				return Promise.reject('Please verify your password');
+			if (password && password !== value) return Promise.reject('Passwords do not match');
 
 			return Promise.resolve();
 		}
@@ -100,10 +101,7 @@ export class Account extends Component {
 			})
 				.then(status)
 				.then(() => setUser({ imageUrl: res.link }))
-				.catch(error => {
-					message.error(`${info.file.name} file upload failed.`);
-					console.error(error);
-				});
+				.catch(error);
 		} else if (info.file.status === 'error') {
 			console.error(info);
 			message.error(`${info.file.name} file upload failed.`);
@@ -138,10 +136,7 @@ export class Account extends Component {
 				})
 					.then(status)
 					.then(() => logout(true)) // Indicating account is deleted
-					.catch(error => {
-						console.error(error);
-						message.error('Could not delete account');
-					});
+					.catch(error);
 			}
 		});
 	}
