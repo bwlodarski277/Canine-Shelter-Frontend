@@ -1,10 +1,12 @@
+import { GoogleOutlined } from '@ant-design/icons';
 import { Button, Card, Divider, Form, Input, message } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { Component } from 'react';
-
+import { GoogleLogin } from 'react-google-login';
 import { Redirect } from 'react-router';
 import UserContext from '../contexts/user';
 import { json, status } from '../helpers/fetch';
+import { googleOauth } from '../config';
 
 const { Item } = Form;
 
@@ -40,10 +42,11 @@ class Login extends Component {
 						this.context.login(userData);
 					});
 			})
-			.catch(error => {
-				message.error('Invalid username or password');
-				console.error(error);
-			});
+			.catch(() => message.error('Invalid username or password.'));
+	}
+
+	handleLogin(data) {
+		console.log(data);
 	}
 
 	render() {
@@ -61,13 +64,24 @@ class Login extends Component {
 						<Item label="Password" name="password" rules={passwordRules}>
 							<Input.Password placeholder="Password" />
 						</Item>
-						<Divider />
+						{/* <Divider /> */}
 						<Item wrapperCol={{ offset: 4, span: 16 }}>
 							<Button type="primary" htmlType="submit">
-								Log In
+								Log in
 							</Button>
 						</Item>
 					</Form>
+					<Divider>OR</Divider>
+					<GoogleLogin
+						clientId={googleOauth.clientID}
+						onSuccess={this.handleLogin}
+						onFailure={this.handleLogin}
+						render={renderProps => (
+							<Button icon={<GoogleOutlined />} onClick={renderProps.onClick}>
+								Log in with Google
+							</Button>
+						)}
+					/>
 				</Card>
 			</section>
 		);
