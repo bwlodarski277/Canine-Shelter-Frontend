@@ -97,7 +97,7 @@ class SearchList extends Component {
 		const { list, count, currentPage } = this.state;
 		const { pageSizeOptions, defaultPageSize, columns } = this.props;
 		const dataList = list.length ? (
-			this.props.listMapping(list, this.state.extraFuncs)
+			this.props.listMapping(list, this.state.extraFuncs, this.props.extraVars)
 		) : (
 			<Row style={{ minHeight: '70vh' }}>
 				<Empty style={{ margin: 'auto' }} />
@@ -135,7 +135,7 @@ class SearchList extends Component {
 						/>
 					</Input.Group>
 				</section>
-				<section style={{ minHeight: '70vh' }}>{dataList}</section>
+				<section>{dataList}</section>
 				<span style={{ textAlign: 'center' }}>
 					<Pagination
 						current={currentPage}
@@ -178,7 +178,11 @@ SearchList.propTypes = {
 	/**
 	 * List of extra functions to be used in
 	 */
-	extraFuncs: PropTypes.objectOf(PropTypes.func)
+	extraFuncs: PropTypes.objectOf(PropTypes.func),
+	/**
+	 * List of extra variables to be passed to the mapping function
+	 */
+	extraVars: PropTypes.objectOf(PropTypes.any)
 };
 
 const SearchListWrapper = props => {
