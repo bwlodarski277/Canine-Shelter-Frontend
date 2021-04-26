@@ -6,18 +6,21 @@ import { Layout, message } from 'antd';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
+import { error, json, status } from './helpers/fetch';
 import Home from './components/home';
 import IconCredit from './components/iconCredit';
 import Dogs from './components/dogs';
 import UserContext from './contexts/user';
 import Login from './components/login';
-import { error, json, status } from './helpers/fetch';
 import maxAge from './utilities/cookieAge';
 import Register from './components/register';
 import Account from './components/account';
 import Breeds from './components/breeds';
 import BreedDogs from './components/breedDogs';
 import { DogDetails } from './components/dogDetails';
+import Shelters from './components/shelters';
+import ShelterDogs from './components/shelterDogs';
+import StaffArea from './components/staffArea';
 
 const { Header, Content, Footer } = Layout;
 
@@ -65,7 +68,7 @@ class App extends Component {
 				cookies.set('refresh', refresh.token, { path: '/', maxAge: maxAge(refresh.exp) });
 				this.loginJwt(jwt.token);
 			})
-			.catch(error => console.error(error));
+			.catch(error);
 	}
 
 	/**
@@ -88,9 +91,9 @@ class App extends Component {
 						this.setState({ user: userData, loggedIn: true });
 						console.log(user);
 					})
-					.catch(error => console.error(error));
+					.catch(error);
 			})
-			.catch(error => console.error(error));
+			.catch(error);
 	}
 
 	/**
@@ -139,11 +142,15 @@ class App extends Component {
 		const { user } = this.state;
 		const updateFields = {};
 		Object.keys(formData).map(key => {
-			if (data[key] !== undefined) {
+			if (data[key] !== undefined && data[key] !== '') {
 				user[key] = formData[key]; // Update values in the user object
 				updateFields[key] = formData[key]; // Filtering out fields that weren't set
 			}
 		});
+		if (!Object.keys(updateFields).length) {
+			message.info('Please enter at least one field.');
+			return;
+		}
 		// Post new data
 		fetch(user.links.self, {
 			method: 'PUT',
@@ -161,7 +168,7 @@ class App extends Component {
 				message.success('Profile updated successfully');
 				if (form) form.current.resetFields();
 			})
-			.catch(err => json(err).then(error));
+			.catch(error);
 	}
 
 	render() {
@@ -194,10 +201,12 @@ class App extends Component {
 								<Route path="/breeds" component={Breeds} />
 								<Route path="/dogs/:id" component={DogDetails} />
 								<Route path="/dogs" component={Dogs} />
-								<Route path="/shelters" />
+								<Route path="/shelters/:id" component={ShelterDogs} />
+								<Route path="/shelters" component={Shelters} />
 								<Route path="/login" component={Login} />
 								<Route path="/register" component={Register} />
 								<Route path="/account" component={Account} />
+								<Route path="/staffArea" component={StaffArea} />
 								<Route path="/" exact={true} component={Home} />
 							</Switch>
 						</Content>
