@@ -9,6 +9,12 @@ import { error, json, status } from '../helpers/fetch';
 import StaffManagement from './staffManagement';
 import StaffAssign from './staffAssign';
 
+/**
+ * Staff area
+ * Allows new staff to choose their location or create a new one.
+ * Allows existing staff to modify their location, add dogs and view
+ * the dogs at their location. Allows for breed creation.
+ */
 export class StaffArea extends Component {
 	constructor(props) {
 		super(props);
@@ -58,10 +64,63 @@ export class StaffArea extends Component {
 			.catch(error);
 	}
 
+	/**
+	 * Creates a new locatiom.
+	 * @param {object} data data to register a new location
+	 */
 	createLocation(data) {
-		return data;
+		const { jwt } = this.props.context;
+		const fields = {};
+		const { staffKey, ...newLoc } = data;
+		Object.keys(newLoc).map(key => {
+			// Filtering out fields that weren't set
+			if (newLoc[key] !== undefined && newLoc[key] !== '') fields[key] = newLoc[key];
+		});
+		fetch('http://localhost:3000/api/v1/locations', {
+			method: 'POST',
+			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
+			body: JSON.stringify(fields)
+		})
+			.then(status)
+			.then(json)
+			.then(({ id: locationId, link }) => {
+				// Getting the new location
+				fetch(link)
+					.then(status)
+					.then(json)
+					.then(location => {
+						// Setting the staff member associated with location
+						fetch(`http://localhost:3000/api/v1/staff`, {
+							method: 'POST',
+							headers: {
+								Authorization: 'Bearer ' + jwt,
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ locationId, staffKey })
+						})
+							.then(status)
+							.then(json)
+							.then(({ link }) => {
+								// Getting staff record details
+								fetch(link, { headers: { Authorization: 'Bearer ' + jwt } })
+									.then(status)
+									.then(json)
+									.then(staff => {
+										this.setState({ staff, assigned: true, location });
+									})
+									.catch(error);
+							})
+							.catch(error);
+					});
+			})
+			.catch(error);
 	}
 
+	/**
+	 * Updates the current location
+	 * @param {object} data data to update the location
+	 * @param {object} form form that called this function
+	 */
 	updateLocation(data, form) {
 		const { jwt } = this.props.context;
 		const { location } = this.state;
@@ -91,6 +150,11 @@ export class StaffArea extends Component {
 			.catch(error);
 	}
 
+	/**
+	 * Registers a new dog in the current shelter.
+	 * @param {object} data data to register a dog
+	 * @param {object} form form that called this function
+	 */
 	addDog(data, form) {
 		const { jwt } = this.props.context;
 		const { breedId, ...formData } = data;
@@ -135,6 +199,11 @@ export class StaffArea extends Component {
 			.catch(error);
 	}
 
+	/**
+	 * Registers a new breed.
+	 * @param {object} data data to register a breed
+	 * @param {object} form form that called this function
+	 */
 	addBreed(data, form) {
 		const { jwt } = this.props.context;
 		fetch('http://localhost:3000/api/v1/breeds', {
@@ -152,6 +221,10 @@ export class StaffArea extends Component {
 			.catch(error);
 	}
 
+	/**
+	 * Gets a list of empty locations (no staff)
+	 * @param {string} jwt JWT for auth
+	 */
 	getEmptyLocations(jwt) {
 		fetch('http://localhost:3000/api/v1/staff/unstaffed', {
 			headers: { Authorization: 'Bearer ' + jwt }
@@ -174,6 +247,7 @@ export class StaffArea extends Component {
 			.then(json)
 			.then(res => {
 				console.log(res);
+				// If user is assigned to location, get location details
 				if (res.staffId) {
 					this.setState({ staff: res, assigned: true });
 					fetch(res.links.location)
@@ -187,6 +261,9 @@ export class StaffArea extends Component {
 		this.getBreeds();
 	}
 
+	/**
+	 * Gets a list of all breeds.
+	 */
 	getBreeds() {
 		fetch('http://localhost:3000/api/v1/breeds?select=name&limit=0')
 			.then(status)
