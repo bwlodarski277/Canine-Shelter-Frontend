@@ -19,11 +19,24 @@ const nameRules = [
 	{ min: 3, max: 32, message: 'The name must be between or 3-32 characters' }
 ];
 
+const breedRules = [{ required: true, message: 'Please select a breed' }];
+
+const newBreedName = [
+	{ required: true, message: "Please enter the breed's name" },
+	{ max: 64, message: 'Breed name must not be longer than 64 characters' }
+];
+
 const shelterForm = React.createRef();
 const dogForm = React.createRef();
+const breedForm = React.createRef();
 
 const StaffManagement = props => {
-	const { location } = props;
+	const { location, breeds } = props;
+	const breedList = breeds.map(breed => (
+		<Select.Option key={breed.id} value={breed.id}>
+			{breed.name}
+		</Select.Option>
+	));
 	const dogList = (
 		<>
 			<Title level={3}>Dogs list</Title>
@@ -32,6 +45,7 @@ const StaffManagement = props => {
 	);
 	return (
 		<>
+			{/* Location editor */}
 			<Title level={3}>Manage location</Title>
 			<Form
 				ref={shelterForm}
@@ -53,6 +67,7 @@ const StaffManagement = props => {
 				</Item>
 			</Form>
 			<Divider />
+
 			{/* Form for adding new dogs to the DB */}
 			<Title level={3}>Add dog</Title>
 			<Form
@@ -69,7 +84,7 @@ const StaffManagement = props => {
 					<Input.TextArea placeholder="Description" rows={5} />
 				</Item>
 				<Item name="gender" label="Gender">
-					<Select>
+					<Select placeholder="Gender">
 						<Select.Option key="0" value={false}>
 							Female
 						</Select.Option>
@@ -78,8 +93,16 @@ const StaffManagement = props => {
 						</Select.Option>
 					</Select>
 				</Item>
+				<Item
+					name="breedId"
+					label="Breed"
+					rules={breedRules}
+					extra="See breed picker below for help."
+				>
+					<Select placeholder="Breed">{breedList}</Select>
+				</Item>
 				<Item name="age" label="Age">
-					<InputNumber min={0} style={{ float: 'left' }} />
+					<InputNumber min={0} style={{ float: 'left' }} placeholder="Age" />
 				</Item>
 
 				<Item wrapperCol={{ offset: 4, span: 16 }}>
@@ -89,14 +112,38 @@ const StaffManagement = props => {
 				</Item>
 			</Form>
 
+			{/* Breed helper */}
 			<Collapse style={{ marginBottom: '1em' }}>
 				<Collapse.Panel header="Need help with choosing the breed?">
 					<BreedHelper />
 				</Collapse.Panel>
 			</Collapse>
-
 			<Divider />
-			{/* When dogs are being fetched, don't show this */}
+
+			{/* Form for adding new breeds to the DB */}
+			<Title level={3}>Add breed</Title>
+			<Form
+				ref={breedForm}
+				style={{ marginTop: '1em' }}
+				labelCol={{ span: 8 }}
+				wrapperCol={{ span: 16 }}
+				onFinish={data => props.addBreed(data, dogForm)}
+			>
+				<Item name="name" label="Name" rules={newBreedName}>
+					<Input placeholder="Name" />
+				</Item>
+				<Item name="description" label="Description">
+					<Input.TextArea placeholder="Description" rows={5} />
+				</Item>
+				<Item wrapperCol={{ offset: 4, span: 16 }}>
+					<Button type="primary" htmlType="submit">
+						Add breed
+					</Button>
+				</Item>
+			</Form>
+			<Divider />
+
+			{/* Shelter dogs list */}
 			{location.id && dogList}
 		</>
 	);
@@ -105,7 +152,9 @@ const StaffManagement = props => {
 StaffManagement.propTypes = {
 	updateLocation: PropTypes.func,
 	addDog: PropTypes.func,
-	location: PropTypes.object
+	addBreed: PropTypes.func,
+	location: PropTypes.object,
+	breeds: PropTypes.arrayOf(PropTypes.object)
 };
 
 export default StaffManagement;
