@@ -1,0 +1,13 @@
+@import '~antd/dist/antd.css';
+
+.title {
+	float: left;
+	color: whitesmoke;
+	padding-right: 24px;
+	padding-bottom: 0px;
+	margin: 0px;
+}
+
+.content {
+	padding: 2em;
+}
