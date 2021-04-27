@@ -26,12 +26,20 @@ const Nav = () => {
 					<Link to="/shelters">Shelters</Link>
 				</Item>
 				{context.loggedIn ? (
-					<Item key="5" style={{ float: 'right' }}>
-						<Link to="/account">
-							<Avatar style={{ marginRight: '15px' }} src={context.user.imageUrl} />
-							Account
-						</Link>
-					</Item>
+					<>
+						<Item key="5" style={{ float: 'right' }}>
+							<Link to="/account">
+								<Avatar
+									style={{ marginRight: '15px' }}
+									src={context.user.imageUrl}
+								/>
+								Account
+							</Link>
+						</Item>
+						<Item key="6">
+							<Link to="/chats">Chats</Link>
+						</Item>
+					</>
 				) : (
 					<>
 						<Item key="5" style={{ float: 'right' }}>
@@ -43,7 +51,7 @@ const Nav = () => {
 					</>
 				)}
 				{context.user.role === 'staff' && (
-					<Item key="6" style={{ float: 'right' }}>
+					<Item key="7" style={{ float: 'right' }}>
 						<Link to="/staffArea">Staff Area</Link>
 					</Item>
 				)}
