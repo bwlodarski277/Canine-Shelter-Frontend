@@ -2,10 +2,16 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Divider, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
+import UserContext from '../contexts/user';
 
-class ShelterListItem extends Component {
+class ShelterListItemInner extends Component {
 	render() {
-		const { shelter, onClick } = this.props;
+		const {
+			shelter,
+			onClick,
+			goToChat,
+			context: { user }
+		} = this.props;
 		return (
 			<section key={shelter.id} id={shelter.id}>
 				<Title level={3}>{shelter.name}</Title>
@@ -14,7 +20,7 @@ class ShelterListItem extends Component {
 					<Button type="primary" onClick={onClick}>
 						View dogs
 					</Button>
-					<Button>Contact shelter</Button>
+					{user.role === 'user' && <Button onClick={goToChat}>Contact shelter</Button>}
 				</Space>
 				<Divider />
 			</section>
@@ -22,9 +28,21 @@ class ShelterListItem extends Component {
 	}
 }
 
-ShelterListItem.propTypes = {
+ShelterListItemInner.propTypes = {
 	shelter: PropTypes.object,
-	onClick: PropTypes.func
+	onClick: PropTypes.func,
+	goToChat: PropTypes.func,
+	user: PropTypes.object
 };
+
+const ShelterListItem = props => {
+	return (
+		<UserContext.Consumer>
+			{context => <ShelterListItemInner context={context} {...props} />}
+		</UserContext.Consumer>
+	);
+};
+
+ShelterListItem.propTypes = ShelterListItemInner.propTypes;
 
 export default ShelterListItem;
