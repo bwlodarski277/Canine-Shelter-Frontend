@@ -21,6 +21,8 @@ import { DogDetails } from './components/dogDetails';
 import Shelters from './components/shelters';
 import ShelterDogs from './components/shelterDogs';
 import StaffArea from './components/staffArea';
+import Chats from './components/chats';
+import Chat from './components/chat';
 
 const { Header, Content, Footer } = Layout;
 
@@ -203,6 +205,8 @@ class App extends Component {
 								<Route path="/dogs" component={Dogs} />
 								<Route path="/shelters/:id" component={ShelterDogs} />
 								<Route path="/shelters" component={Shelters} />
+								<Route path="/chats/:id" component={Chat} />
+								<Route path="/chats" component={Chats} />
 								<Route path="/login" component={Login} />
 								<Route path="/register" component={Register} />
 								<Route path="/account" component={Account} />
