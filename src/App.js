@@ -17,7 +17,7 @@ import Register from './components/register';
 import Account from './components/account';
 import Breeds from './components/breeds';
 import BreedDogs from './components/breedDogs';
-import { DogDetails } from './components/dogDetails';
+import DogDetails from './components/dogDetails';
 import Shelters from './components/shelters';
 import ShelterDogs from './components/shelterDogs';
 import StaffArea from './components/staffArea';
@@ -44,6 +44,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
+		// Getting JWT from cookies
 		const { cookies } = this.state;
 		const jwt = cookies.get('jwt');
 		const refresh = cookies.get('refresh');
@@ -174,6 +175,7 @@ class App extends Component {
 	}
 
 	render() {
+		// Setting context
 		const context = {
 			user: this.state.user,
 			setUser: this.setUser,
@@ -205,7 +207,8 @@ class App extends Component {
 								<Route path="/dogs" component={Dogs} />
 								<Route path="/shelters/:id" component={ShelterDogs} />
 								<Route path="/shelters" component={Shelters} />
-								<Route path="/chats/:id" component={Chat} />
+								<Route path="/chats/:locationId/:chatId" component={Chat} />
+								<Route path="/chats/:locationId" component={Chat} />
 								<Route path="/chats" component={Chats} />
 								<Route path="/login" component={Login} />
 								<Route path="/register" component={Register} />
