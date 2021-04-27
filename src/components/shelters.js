@@ -34,11 +34,12 @@ const getShelters = async (currentPage, pageSize, query, order, direction) => {
  * Maps the list of breeds to a set of React componenets.
  * @param {List<object>} shelters list of breed objects
  */
-const mapShelters = (shelters, { goToShelter }) => {
+const mapShelters = (shelters, { goToShelter, goToChat }) => {
 	const shelterList = shelters.map(shelter => (
 		<ShelterListItem
 			key={shelter.id}
 			shelter={shelter}
+			goToChat={() => goToChat(shelter.id)}
 			onClick={() => goToShelter(shelter.id)}
 		/>
 	));
@@ -56,6 +57,12 @@ function goToShelter(id) {
 	history.push(`/shelters/${id}`);
 }
 
+// eslint-disable-next-line func-style
+function goToChat(id) {
+	const { history } = this.props;
+	history.push(`/chats/${id}`);
+}
+
 /**
  * Breeds list component
  * Used for displaying a list of breeds on the breeds page
@@ -68,7 +75,7 @@ const Shelters = props => {
 			columns={['name', 'address']}
 			fetchFunction={getShelters}
 			listMapping={mapShelters}
-			extraFuncs={{ goToShelter }}
+			extraFuncs={{ goToShelter, goToChat }}
 			{...props}
 		/>
 	);
