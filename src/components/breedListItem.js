@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Divider } from 'antd';
+import { Button, Collapse, Divider, Form, Input } from 'antd';
 import Title from 'antd/lib/typography/Title';
+const { Item } = Form;
+
+const nameRules = [{ max: 64, message: 'Name must be less than or 64 characters.' }];
 
 class BreedListItem extends Component {
 	render() {
-		const { breed, onClick } = this.props;
+		const form = React.createRef();
+		const { breed, user, onClick, updateBreed, context } = this.props;
 		return (
 			<section key={breed.id} id={breed.id}>
 				<Title level={3}>{breed.name}</Title>
@@ -13,7 +17,36 @@ class BreedListItem extends Component {
 				<Button type="primary" onClick={onClick}>
 					View dogs
 				</Button>
-				<Divider />
+				{user.role === 'staff' && (
+					<>
+						<Collapse style={{ marginTop: '1em', marginBottom: '1em' }}>
+							<Collapse.Panel header="Update breed">
+								<Form
+									ref={form}
+									style={{ marginTop: '1em' }}
+									labelCol={{ span: 8 }}
+									wrapperCol={{ span: 16 }}
+									onFinish={data =>
+										updateBreed(data, breed.links.self, context, form)
+									}
+								>
+									<Item name="name" label="Breed name" rules={nameRules}>
+										<Input placeholder={breed.name} />
+									</Item>
+									<Item name="description" label="Breed description">
+										<Input.TextArea placeholder={breed.description} rows={5} />
+									</Item>
+									<Item wrapperCol={{ offset: 8, span: 16 }}>
+										<Button type="primary" htmlType="submit">
+											Update breed
+										</Button>
+									</Item>
+								</Form>
+							</Collapse.Panel>
+						</Collapse>
+						<Divider />
+					</>
+				)}
 			</section>
 		);
 	}
@@ -21,7 +54,10 @@ class BreedListItem extends Component {
 
 BreedListItem.propTypes = {
 	breed: PropTypes.object,
-	onClick: PropTypes.func
+	user: PropTypes.object,
+	onClick: PropTypes.func,
+	updateBreed: PropTypes.func,
+	context: PropTypes.object
 };
 
 export default BreedListItem;
