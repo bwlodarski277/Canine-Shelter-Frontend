@@ -97,7 +97,12 @@ class SearchList extends Component {
 		const { list, count, currentPage } = this.state;
 		const { pageSizeOptions, defaultPageSize, columns } = this.props;
 		const dataList = list.length ? (
-			this.props.listMapping(list, this.state.extraFuncs, this.props.extraVars)
+			this.props.listMapping(
+				list,
+				this.state.extraFuncs,
+				this.props.extraVars,
+				this.props.context
+			)
 		) : (
 			<Row style={{ minHeight: '70vh' }}>
 				<Empty style={{ margin: 'auto' }} />
@@ -182,7 +187,11 @@ SearchList.propTypes = {
 	/**
 	 * List of extra variables to be passed to the mapping function
 	 */
-	extraVars: PropTypes.objectOf(PropTypes.any)
+	extraVars: PropTypes.objectOf(PropTypes.any),
+	/**
+	 * React Context
+	 */
+	context: PropTypes.object
 };
 
 const SearchListWrapper = props => {
