@@ -195,7 +195,7 @@ export class Account extends Component {
 					</Form>
 					<Divider />
 					<Space>
-						<Button onClick={this.props.context.logout}>Log out</Button>
+						<Button onClick={() => this.props.context.logout()}>Log out</Button>
 						<Button danger onClick={this.confirmDelete}>
 							Delete account
 						</Button>
