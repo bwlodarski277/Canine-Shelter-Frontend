@@ -67,6 +67,7 @@ const confirmRules = [
 
 /**
  * Registration component
+ * Allows users to register and staff to register as staff.
  */
 class Register extends Component {
 	constructor(props) {
@@ -75,6 +76,10 @@ class Register extends Component {
 		this.register = this.register.bind(this);
 	}
 
+	/**
+	 * Handles registering users.
+	 * @param {object} values data to use to register.
+	 */
 	register(values) {
 		const { confirm, ...registerData } = values;
 		const { username, password } = registerData;

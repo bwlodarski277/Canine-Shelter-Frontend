@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import HeartOutlined from '@ant-design/icons/HeartOutlined';
 import HeartFilled from '@ant-design/icons/HeartFilled';
 
+/**
+ * Favourite component
+ * Used for showing the number of favourites a dog has
+ */
 class Favourite extends Component {
 	constructor(props) {
 		super(props);

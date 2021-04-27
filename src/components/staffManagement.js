@@ -30,6 +30,11 @@ const shelterForm = React.createRef();
 const dogForm = React.createRef();
 const breedForm = React.createRef();
 
+/**
+ * Staff management component
+ * Allows users to create dogs, update their location,
+ * view a list of dogs at their location and create breeds.
+ */
 const StaffManagement = props => {
 	const { location, breeds } = props;
 	const breedList = breeds.map(breed => (

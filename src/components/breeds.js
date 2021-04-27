@@ -33,7 +33,14 @@ const getBreeds = async (currentPage, pageSize, query, order, direction) => {
 
 // Requires function keyword for `this`
 // eslint-disable-next-line func-style
-const updateBreed = (data, breedUrl, context, form) => {
+/**
+ *
+ * @param {object} data data to use to update breed
+ * @param {string} breedUrl URL to the breed resource
+ * @param {object} context user context for authentication
+ * @param {object} form form that called this function
+ */
+function updateBreed(data, breedUrl, context, form) {
 	if (data.name || data.description)
 		fetch(breedUrl, {
 			method: 'PUT',
@@ -49,7 +56,7 @@ const updateBreed = (data, breedUrl, context, form) => {
 			})
 			.catch(error);
 	else message.info('Please enter at least one field to update.');
-};
+}
 
 /**
  * Maps the list of breeds to a set of React componenets.
@@ -59,16 +66,14 @@ const mapBreeds = (breeds, { goToBreed, updateBreed }, _, context) => {
 	const { user = {} } = context;
 	const breedList = breeds.map(breed => {
 		return (
-			<>
-				<BreedListItem
-					key={breed.id}
-					breed={breed}
-					user={user}
-					onClick={() => goToBreed(breed.id)}
-					updateBreed={updateBreed}
-					context={context}
-				/>
-			</>
+			<BreedListItem
+				key={breed.id}
+				breed={breed}
+				user={user}
+				onClick={() => goToBreed(breed.id)}
+				updateBreed={updateBreed}
+				context={context}
+			/>
 		);
 	});
 	return (
@@ -80,6 +85,10 @@ const mapBreeds = (breeds, { goToBreed, updateBreed }, _, context) => {
 
 // Requires function keyword for `this`
 // eslint-disable-next-line func-style
+/**
+ * Goes to the breed dog list.
+ * @param {number} id breed ID
+ */
 function goToBreed(id) {
 	const { history } = this.props;
 	history.push(`/breeds/${id}`);

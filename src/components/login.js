@@ -15,6 +15,7 @@ const passwordRules = [{ required: true, message: 'Please enter your password' }
 
 /**
  * Login component
+ * Handles logging users in.
  */
 class Login extends Component {
 	constructor(props) {
@@ -23,6 +24,10 @@ class Login extends Component {
 		this.login = this.login.bind(this);
 	}
 
+	/**
+	 * Handles login
+	 * @param {object} values username and password
+	 */
 	login(values) {
 		const { username, password } = values;
 		fetch('http://localhost:3000/api/v1/auth/login', {
@@ -45,6 +50,10 @@ class Login extends Component {
 			.catch(() => message.error('Invalid username or password.'));
 	}
 
+	/**
+	 * Handles Google login (not finished)
+	 * @param {object} data login data
+	 */
 	handleLogin(data) {
 		console.log(data);
 	}

@@ -9,6 +9,15 @@ const { Search } = Input;
 /**
  * Search List component.
  * Used for displaying a list of data on the page.
+ * ---
+ * This component works by taking in a fetch function and a list mapping.
+ * The fetch function is used by this component to get a list of something,
+ * for example dog or shelters. The data fetched is passed to the list
+ * mapping function, which generates a list of react components.
+ * ---
+ * A list of functions and variables can also be passed to this component,
+ * and they will be passed back to the list mapping function, so the list of
+ * components can perform actions.
  */
 class SearchList extends Component {
 	constructor(props) {
@@ -85,10 +94,18 @@ class SearchList extends Component {
 		this.setState({ query: value });
 	}
 
+	/**
+	 * Updates the sort direction.
+	 * @param {string} value new direction value
+	 */
 	updateDirection(value) {
 		this.setState({ direction: value });
 	}
 
+	/**
+	 * Updates the column being sorted by
+	 * @param {string} value new order column
+	 */
 	updateOrder(value) {
 		this.setState({ order: value });
 	}

@@ -9,6 +9,7 @@ import SearchList from './searchList';
 
 /**
  * BreedDogs grid component.
+ * Used to display the dogs associated with a breed.
  */
 class BreedDogs extends Component {
 	constructor(props) {
@@ -21,6 +22,15 @@ class BreedDogs extends Component {
 		this.fetchData = this.fetchData.bind(this);
 	}
 
+	/**
+	 * Fetches list of dogs and adds user's favourites to each dog
+	 * @param {number} currentPage current page
+	 * @param {number} pageSize number of dogs per page
+	 * @param {string} query query to search for dogs
+	 * @param {string} order item so order by
+	 * @param {string} direction direction to sort in
+	 * @returns {object} dogs list and total count
+	 */
 	async fetchData(currentPage, pageSize, query, order, direction) {
 		try {
 			let { dogs, count } = await this.getDogs(
@@ -43,6 +53,15 @@ class BreedDogs extends Component {
 		}
 	}
 
+	/**
+	 * Gets a list of dogs given a set of parameters.
+	 * @param {number} currentPage current page
+	 * @param {number} pageSize number of dogs per page
+	 * @param {string} query query to search for dogs
+	 * @param {string} order item so order by
+	 * @param {string} direction direction to sort in
+	 * @returns
+	 */
 	async getDogs(currentPage, pageSize, query, order, direction) {
 		const { id } = this.state;
 		const url = new URL(`http://localhost:3000/api/v1/breeds/${id}/dogs`);
@@ -67,7 +86,7 @@ class BreedDogs extends Component {
 
 	/**
 	 * Maps a list of dogs to a set of React components.
-	 * @param {*} dogs list of dogs passed to this function
+	 * @param {List<object>} dogs list of dogs passed to this function
 	 * @param {object} extraFuncs extra functions passed to component and bound to it
 	 * @returns React components
 	 */

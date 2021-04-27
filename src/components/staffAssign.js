@@ -17,6 +17,11 @@ const staffKeyRules = [
 
 const locationRules = [{ required: true, message: 'Please select a location' }];
 
+/**
+ * Staff Assignment component
+ * Used when staff member is not yet assigned to a location.
+ * Allows them to pick a location or create a new one.
+ */
 const StaffAssign = props => {
 	return (
 		<>
@@ -45,7 +50,9 @@ const StaffAssign = props => {
 					</Button>
 				</Item>
 			</Form>
+
 			<Divider>OR</Divider>
+
 			<Title level={3}>Create new location</Title>
 			<Form
 				style={{ marginTop: '1em' }}
@@ -58,6 +65,9 @@ const StaffAssign = props => {
 				</Item>
 				<Item name="address" label="Location address">
 					<Input.TextArea placeholder="Location address" rows={5} />
+				</Item>
+				<Item label="Staff key" name="staffKey" rules={staffKeyRules}>
+					<Input placeholder="Staff key" />
 				</Item>
 				<Item wrapperCol={{ offset: 4, span: 16 }}>
 					<Button type="primary" htmlType="submit">

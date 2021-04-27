@@ -4,6 +4,10 @@ import { Button, Divider, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import UserContext from '../contexts/user';
 
+/**
+ * Shelter list item
+ * A single list element in a list of shelters.
+ */
 class ShelterListItemInner extends Component {
 	render() {
 		const {

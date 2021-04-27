@@ -12,9 +12,9 @@ import Favourite from './favourite';
 const { Meta } = Card;
 
 /**
+ * DogCard
  * Component for displaying details about a dog.
- * @param {object} props props passed from dogs list
- * @returns
+ * Used in the Dogs list.
  */
 class DogCard extends Component {
 	constructor(props) {
@@ -22,6 +22,9 @@ class DogCard extends Component {
 		this.onClick = this.onClick.bind(this);
 	}
 
+	/**
+	 * Calls the passed in onClick function
+	 */
 	onClick() {
 		this.props.onClick(this.props.dog.id);
 	}

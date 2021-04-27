@@ -20,6 +20,15 @@ class Dogs extends Component {
 		this.getDogs = this.getDogs.bind(this);
 	}
 
+	/**
+	 * Fetches list of dogs and adds user's favourites to each dog
+	 * @param {number} currentPage current page
+	 * @param {number} pageSize number of dogs per page
+	 * @param {string} query query to search for dogs
+	 * @param {string} order item so order by
+	 * @param {string} direction direction to sort in
+	 * @returns {object} dogs list and total count
+	 */
 	async fetchData(currentPage, pageSize, query, order, direction) {
 		try {
 			let { dogs, count } = await this.getDogs(
@@ -40,6 +49,15 @@ class Dogs extends Component {
 		}
 	}
 
+	/**
+	 * Gets a list of dogs given a set of parameters.
+	 * @param {number} currentPage current page
+	 * @param {number} pageSize number of dogs per page
+	 * @param {string} query query to search for dogs
+	 * @param {string} order item so order by
+	 * @param {string} direction direction to sort in
+	 * @returns
+	 */
 	async getDogs(currentPage, pageSize, query, order, direction) {
 		const url = new URL('http://localhost:3000/api/v1/dogs');
 		const params = [

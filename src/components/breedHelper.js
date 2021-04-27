@@ -4,6 +4,10 @@ import { error, json, status } from '../helpers/fetch';
 import noImage from '../images/noImage.jpg';
 import { Button, Divider, Form, Image, Select } from 'antd';
 
+/**
+ * Breed Helper component
+ * Uses the Dogs CEO API to help staff with identifying dogs.
+ */
 export class BreedHelper extends Component {
 	constructor(props) {
 		super(props);
@@ -16,11 +20,14 @@ export class BreedHelper extends Component {
 	}
 
 	componentDidMount() {
+		// Fetching dogs
 		fetch('https://dog.ceo/api/breeds/list/all')
 			.then(status)
 			.then(json)
 			.then(({ message: list }) => {
 				const breedList = {};
+				// If dog has no sub-breeds, add the breed to the list
+				// If it has sub-breeds, map each one
 				for (const [breed, subBreeds] of Object.entries(list))
 					if (!subBreeds.length) breedList[breed] = breed;
 					else subBreeds.forEach(sub => (breedList[`${breed}-${sub}`] = [breed, sub]));

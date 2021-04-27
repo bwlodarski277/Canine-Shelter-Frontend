@@ -6,6 +6,10 @@ const { Item } = Form;
 
 const nameRules = [{ max: 64, message: 'Name must be less than or 64 characters.' }];
 
+/**
+ * Breed List Item component
+ * Used in the breeds list. This is a single element in the list.
+ */
 class BreedListItem extends Component {
 	render() {
 		const form = React.createRef();
@@ -17,36 +21,35 @@ class BreedListItem extends Component {
 				<Button type="primary" onClick={onClick}>
 					View dogs
 				</Button>
+				{/* If the user is staff, let them update the breed */}
 				{user.role === 'staff' && (
-					<>
-						<Collapse style={{ marginTop: '1em', marginBottom: '1em' }}>
-							<Collapse.Panel header="Update breed">
-								<Form
-									ref={form}
-									style={{ marginTop: '1em' }}
-									labelCol={{ span: 8 }}
-									wrapperCol={{ span: 16 }}
-									onFinish={data =>
-										updateBreed(data, breed.links.self, context, form)
-									}
-								>
-									<Item name="name" label="Breed name" rules={nameRules}>
-										<Input placeholder={breed.name} />
-									</Item>
-									<Item name="description" label="Breed description">
-										<Input.TextArea placeholder={breed.description} rows={5} />
-									</Item>
-									<Item wrapperCol={{ offset: 8, span: 16 }}>
-										<Button type="primary" htmlType="submit">
-											Update breed
-										</Button>
-									</Item>
-								</Form>
-							</Collapse.Panel>
-						</Collapse>
-						<Divider />
-					</>
+					<Collapse style={{ marginTop: '1em', marginBottom: '1em' }}>
+						<Collapse.Panel header="Update breed">
+							<Form
+								ref={form}
+								style={{ marginTop: '1em' }}
+								labelCol={{ span: 8 }}
+								wrapperCol={{ span: 16 }}
+								onFinish={data =>
+									updateBreed(data, breed.links.self, context, form)
+								}
+							>
+								<Item name="name" label="Breed name" rules={nameRules}>
+									<Input placeholder={breed.name} />
+								</Item>
+								<Item name="description" label="Breed description">
+									<Input.TextArea placeholder={breed.description} rows={5} />
+								</Item>
+								<Item wrapperCol={{ offset: 8, span: 16 }}>
+									<Button type="primary" htmlType="submit">
+										Update breed
+									</Button>
+								</Item>
+							</Form>
+						</Collapse.Panel>
+					</Collapse>
 				)}
+				<Divider />
 			</section>
 		);
 	}

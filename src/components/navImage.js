@@ -4,7 +4,6 @@ import { useHistory } from 'react-router-dom';
 
 /**
  * Clickable image that naviges to a specified link.
- * @param {object} props props passed from parent
  */
 const NavImage = props => {
 	const history = useHistory();
