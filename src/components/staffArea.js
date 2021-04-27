@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import UserContext from '../contexts/user';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Card, message } from 'antd';
 import Title from 'antd/lib/typography/Title';
@@ -19,6 +20,8 @@ export class StaffArea extends Component {
 		this.createLocation = this.createLocation.bind(this);
 		this.updateLocation = this.updateLocation.bind(this);
 		this.addDog = this.addDog.bind(this);
+		this.addBreed = this.addBreed.bind(this);
+		this.getBreeds = this.getBreeds.bind(this);
 	}
 
 	/**
@@ -27,6 +30,7 @@ export class StaffArea extends Component {
 	 */
 	setLocation(data) {
 		const { jwt } = this.props.context;
+		// Getting the current user's staff ID
 		fetch('http://localhost:3000/api/v1/staff', {
 			method: 'POST',
 			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
@@ -34,12 +38,14 @@ export class StaffArea extends Component {
 		})
 			.then(status)
 			.then(json)
+			// Getting their staff record to get their location
 			.then(({ link }) => {
 				fetch(link, { headers: { Authorization: 'Bearer ' + jwt } })
 					.then(status)
 					.then(json)
 					.then(res => {
 						this.setState({ staff: res, assigned: true });
+						// Getting their location
 						fetch(res.links.location)
 							.then(status)
 							.then(json)
@@ -87,16 +93,18 @@ export class StaffArea extends Component {
 
 	addDog(data, form) {
 		const { jwt } = this.props.context;
+		const { breedId, ...formData } = data;
 		fetch('http://localhost:3000/api/v1/dogs', {
 			method: 'POST',
 			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
-			body: JSON.stringify(data)
+			body: JSON.stringify(formData)
 		})
 			.then(status)
 			.then(json)
 			.then(res => {
 				const { link } = res;
 				const { location } = this.state;
+				// Assigning location
 				fetch(`${link}/location`, {
 					method: 'POST',
 					headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
@@ -104,11 +112,42 @@ export class StaffArea extends Component {
 				})
 					.then(status)
 					.then(json)
-					.then(() => {
-						message.success('Dog added');
-						form.current.resetFields();
-					})
+					.then(console.log)
 					.catch(error);
+				// Assigning breed
+				fetch(`${link}/breed`, {
+					method: 'POST',
+					headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
+					body: JSON.stringify({ breedId })
+				})
+					.then(status)
+					.then(json)
+					.then(console.log)
+					.catch(error);
+				return res;
+			})
+			.then(res => {
+				message.success('Dog added');
+				form.current.resetFields();
+				const { history } = this.props;
+				history.push(`/dogs/${res.id}`);
+			})
+			.catch(error);
+	}
+
+	addBreed(data, form) {
+		const { jwt } = this.props.context;
+		fetch('http://localhost:3000/api/v1/breeds', {
+			method: 'POST',
+			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		})
+			.then(status)
+			.then(json)
+			.then(() => {
+				message.success('Breed added');
+				this.getBreeds();
+				form.current.resetFields();
 			})
 			.catch(error);
 	}
@@ -145,18 +184,29 @@ export class StaffArea extends Component {
 				} else this.getEmptyLocations(jwt);
 			})
 			.catch(error);
+		this.getBreeds();
+	}
+
+	getBreeds() {
+		fetch('http://localhost:3000/api/v1/breeds?select=name&limit=0')
+			.then(status)
+			.then(json)
+			.then(data => this.setState({ breeds: data.breeds }))
+			.catch(error);
 	}
 
 	render() {
 		const { user } = this.props.context;
-		const { assigned, locations, location = {} } = this.state;
+		const { assigned, locations, breeds = [], location = {} } = this.state;
 		if (user.role !== 'staff') return <Redirect to="/" />;
 
 		const body = assigned ? (
 			<StaffManagement
 				updateLocation={this.updateLocation}
 				addDog={this.addDog}
+				addBreed={this.addBreed}
 				location={location}
+				breeds={breeds}
 			/>
 		) : (
 			<StaffAssign
@@ -179,13 +229,16 @@ export class StaffArea extends Component {
 }
 
 StaffArea.propTypes = {
-	context: PropTypes.object
+	context: PropTypes.object,
+	history: PropTypes.object
 };
 
-const StaffAreaWrapper = () => {
+const StaffAreaWrapper = props => {
 	return (
-		<UserContext.Consumer>{context => <StaffArea context={context} />}</UserContext.Consumer>
+		<UserContext.Consumer>
+			{context => <StaffArea context={context} {...props} />}
+		</UserContext.Consumer>
 	);
 };
 
-export default StaffAreaWrapper;
+export default withRouter(StaffAreaWrapper);
