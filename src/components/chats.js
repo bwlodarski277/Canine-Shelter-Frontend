@@ -5,6 +5,7 @@ import { error, json, status } from '../helpers/fetch';
 import { Button, Card, Divider, Empty } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { withRouter } from 'react-router-dom';
+import { baseUrl } from '../config';
 
 /**
  * Chats component
@@ -54,7 +55,7 @@ export class Chats extends Component {
 				.catch(error);
 		// If user is staff, get list of chats with users
 		else if (user.role === 'staff')
-			fetch('http://localhost:3000/api/v1/auth/staff', {
+			fetch(`${baseUrl}/auth/staff`, {
 				headers: { Authorization: 'Bearer ' + jwt }
 			})
 				.then(status)

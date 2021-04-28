@@ -6,6 +6,7 @@ import { updateFavs, getUserFavs, getDogFavs } from '../helpers/updateFavs';
 import DogCard from './dogCard';
 import UserContext from '../contexts/user';
 import SearchList from './searchList';
+import { baseUrl } from '../config';
 
 /**
  * Dog grid component.
@@ -59,7 +60,7 @@ class Dogs extends Component {
 	 * @returns
 	 */
 	async getDogs(currentPage, pageSize, query, order, direction) {
-		const url = new URL('http://localhost:3000/api/v1/dogs');
+		const url = new URL(`${baseUrl}/dogs`);
 		const params = [
 			['select', 'name'],
 			['select', 'description'],

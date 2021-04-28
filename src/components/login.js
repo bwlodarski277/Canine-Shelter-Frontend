@@ -1,4 +1,4 @@
-import { GoogleOutlined } from '@ant-design/icons';
+import GoogleOutlined from '@ant-design/icons/GoogleOutlined';
 import { Button, Card, Divider, Form, Input, message } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { Component } from 'react';
@@ -7,6 +7,7 @@ import { Redirect } from 'react-router';
 import UserContext from '../contexts/user';
 import { json, status } from '../helpers/fetch';
 import { googleOauth } from '../config';
+import { baseUrl } from '../config';
 
 const { Item } = Form;
 
@@ -30,7 +31,7 @@ class Login extends Component {
 	 */
 	login(values) {
 		const { username, password } = values;
-		fetch('http://localhost:3000/api/v1/auth/login', {
+		fetch(`${baseUrl}/auth/login`, {
 			headers: { Authorization: 'Basic ' + btoa(`${username}:${password}`) }
 		})
 			.then(status)

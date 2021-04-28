@@ -5,6 +5,7 @@ import { Card, message } from 'antd';
 import SearchList from './searchList';
 import { withRouter } from 'react-router-dom';
 import BreedListItem from './breedListItem';
+import { baseUrl } from '../config';
 
 /**
  * Function for fetching data in the search list.
@@ -14,7 +15,7 @@ import BreedListItem from './breedListItem';
  * @returns {object} list of breeds in the page and total count
  */
 const getBreeds = async (currentPage, pageSize, query, order, direction) => {
-	const url = new URL('http://localhost:3000/api/v1/breeds');
+	const url = new URL(`${baseUrl}/breeds`);
 	const params = [
 		['select', 'name'],
 		['select', 'description'],

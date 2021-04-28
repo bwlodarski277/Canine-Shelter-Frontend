@@ -3,4 +3,6 @@ const googleOauth = {
 	clientSecret: '-R73Z9R2HuHvHab2kqTdETMn'
 };
 
-export { googleOauth };
+const baseUrl = 'https://canoe-janet-3000.codio-box.uk/api/v1';
+
+export { googleOauth, baseUrl };

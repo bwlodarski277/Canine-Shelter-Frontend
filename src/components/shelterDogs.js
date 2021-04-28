@@ -6,6 +6,7 @@ import { updateFavs, getDogFavs, getUserFavs } from '../helpers/updateFavs';
 import DogCard from './dogCard';
 import UserContext from '../contexts/user';
 import SearchList from './searchList';
+import { baseUrl } from '../config';
 
 /**
  * Shelter dogs component
@@ -64,7 +65,7 @@ class ShelterDogs extends Component {
 	 */
 	async getDogs(currentPage, pageSize, query, order, direction) {
 		const { id } = this.state;
-		const url = new URL(`http://localhost:3000/api/v1/locations/${id}/dogs`);
+		const url = new URL(`${baseUrl}/locations/${id}/dogs`);
 		const params = [
 			['select', 'name'],
 			['select', 'description'],
