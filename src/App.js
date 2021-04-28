@@ -23,6 +23,7 @@ import ShelterDogs from './components/shelterDogs';
 import StaffArea from './components/staffArea';
 import Chats from './components/chats';
 import Chat from './components/chat';
+import { baseUrl } from './config';
 
 const { Header, Content, Footer } = Layout;
 
@@ -57,7 +58,7 @@ class App extends Component {
 	 * @param {string} refresh JWT refresh token
 	 */
 	refreshJwt(refresh) {
-		fetch('http://localhost:3000/api/v1/auth/jwt/refresh', {
+		fetch(`${baseUrl}/auth/jwt/refresh`, {
 			method: 'POST',
 			body: JSON.stringify({ refresh }),
 			headers: { 'Content-Type': 'application/json' }
@@ -79,7 +80,7 @@ class App extends Component {
 	 * @param {string} jwt JSON Web Token to use for logging in
 	 */
 	loginJwt(jwt) {
-		fetch('http://localhost:3000/api/v1/auth/login', {
+		fetch(`${baseUrl}/auth/login`, {
 			headers: { Authorization: 'Bearer ' + jwt }
 		})
 			.then(status)
@@ -104,7 +105,7 @@ class App extends Component {
 	 * @param {object} user user object returned from the DB
 	 */
 	login(user) {
-		fetch('http://localhost:3000/api/v1/auth/jwt', {
+		fetch(`${baseUrl}/auth/jwt`, {
 			headers: { Authorization: 'Basic ' + btoa(`${user.username}:${user.password}`) }
 		})
 			.then(status)

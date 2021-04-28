@@ -65,7 +65,7 @@ class BreedDogs extends Component {
 	 */
 	async getDogs(currentPage, pageSize, query, order, direction) {
 		const { id } = this.state;
-		const url = new URL(`${baseUrl}/${id}/dogs`);
+		const url = new URL(`${baseUrl}/breeds/${id}/dogs`);
 		const params = [
 			['select', 'name'],
 			['select', 'description'],
