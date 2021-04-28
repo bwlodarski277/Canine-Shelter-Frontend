@@ -1,12 +1,15 @@
 import { Avatar, Button, Card, Divider, Form, Input, message, Modal, Space, Upload } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { Component } from 'react';
-import { ExclamationCircleFilled, UploadOutlined } from '@ant-design/icons';
+// import { ExclamationCircleFilled, UploadOutlined } from '@ant-design/icons';
+import ExclamationCircleFilled from '@ant-design/icons/ExclamationCircleFilled';
+import UploadOutlined from '@ant-design/icons/UploadOutlined';
 import PropTypes from 'prop-types';
 import UserContext from '../contexts/user';
 import { error, status } from '../helpers/fetch';
 const { Item } = Form;
 const { confirm } = Modal;
+import { baseUrl } from '../config';
 
 const usernameRules = [
 	{
@@ -70,7 +73,7 @@ export class Account extends Component {
 				maxCount: 1,
 				showUploadList: false,
 				name: 'upload',
-				action: 'http://localhost:3000/api/v1/uploads',
+				action: `${baseUrl}/uploads`,
 				headers: { Authorization: 'Bearer ' + jwt },
 				onChange: this.onPictureChanged
 			}

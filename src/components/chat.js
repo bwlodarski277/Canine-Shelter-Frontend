@@ -4,8 +4,9 @@ import UserContext from '../contexts/user';
 import { error, json, status } from '../helpers/fetch';
 import { Button, Card, Empty, Form, Input, List } from 'antd';
 import Title from 'antd/lib/typography/Title';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import CloseCircleOutlined from '@ant-design/icons/CloseCircleOutlined';
 const { Item } = Form;
+import { baseUrl } from '../config';
 
 const messageRules = [{ required: true, message: 'Please enter a message' }];
 
@@ -36,7 +37,7 @@ export class Chat extends Component {
 		// If chatId is provided
 		if (!isNaN(chatId)) {
 			// Get the chat
-			const url = `http://localhost:3000/api/v1/locations/${locationId}/chats/${chatId}`;
+			const url = `${baseUrl}/locations/${locationId}/chats/${chatId}`;
 			fetch(url, { headers: { Authorization: 'Bearer ' + jwt } })
 				.then(status)
 				.then(json)
@@ -82,7 +83,7 @@ export class Chat extends Component {
 					} else {
 						// If not found, create the chat
 						console.log('Not found chat, creating');
-						fetch(`http://localhost:3000/api/v1/locations/${locationId}/chats`, {
+						fetch(`${baseUrl}/locations/${locationId}/chats`, {
 							method: 'POST',
 							headers: {
 								Authorization: 'Bearer ' + jwt,

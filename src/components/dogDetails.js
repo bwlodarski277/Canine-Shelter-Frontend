@@ -28,9 +28,10 @@ import UserContext from '../contexts/user';
 import ShelterListItem from './shelterListItem';
 import BreedListItem from './breedListItem';
 import { withRouter } from 'react-router';
-import { UploadOutlined } from '@ant-design/icons';
+import UploadOutlined from '@ant-design/icons/UploadOutlined';
 const { Item } = Form;
 const { TabPane } = Tabs;
+import { baseUrl } from '../config';
 
 const nameRules = [{ min: 3, max: 32, message: 'Name must be betweeen or 3-32 characters' }];
 
@@ -56,7 +57,7 @@ export class DogDetails extends Component {
 				maxCount: 1,
 				showUploadList: false,
 				name: 'upload',
-				action: 'http://localhost:3000/api/v1/uploads',
+				action: `${baseUrl}/uploads`,
 				headers: { Authorization: 'Bearer ' + jwt },
 				onChange: this.onPictureChanged
 			}
@@ -73,7 +74,7 @@ export class DogDetails extends Component {
 		const { id } = this.props.match.params;
 		const { user, jwt, loggedIn } = this.props.context;
 
-		const url = 'http://localhost:3000/api/v1/dogs';
+		const url = `${baseUrl}/dogs`;
 
 		// Getting the dog's info
 		fetch(`${url}/${id}`, { cache: 'no-cache' })
@@ -122,7 +123,7 @@ export class DogDetails extends Component {
 
 		if (user.role === 'staff')
 			// Get a list of breeds
-			fetch('http://localhost:3000/api/v1/breeds?select=name&limit=0')
+			fetch(`${baseUrl}/breeds?select=name&limit=0`)
 				.then(status)
 				.then(json)
 				.then(data => this.setState({ breeds: data.breeds }))

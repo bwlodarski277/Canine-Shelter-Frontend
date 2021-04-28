@@ -1,6 +1,7 @@
 import { Button, Card, Divider, Form, Input } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { Component } from 'react';
+import { baseUrl } from '../config';
 
 import { Redirect } from 'react-router';
 import UserContext from '../contexts/user';
@@ -83,7 +84,7 @@ class Register extends Component {
 	register(values) {
 		const { confirm, ...registerData } = values;
 		const { username, password } = registerData;
-		fetch('http://localhost:3000/api/v1/users', {
+		fetch(`${baseUrl}/users`, {
 			headers: { 'Content-Type': 'application/json' },
 			method: 'POST',
 			body: JSON.stringify(registerData)

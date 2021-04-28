@@ -8,6 +8,7 @@ import Title from 'antd/lib/typography/Title';
 import { error, json, status } from '../helpers/fetch';
 import StaffManagement from './staffManagement';
 import StaffAssign from './staffAssign';
+import { baseUrl } from '../config';
 
 /**
  * Staff area
@@ -37,7 +38,7 @@ export class StaffArea extends Component {
 	setLocation(data) {
 		const { jwt } = this.props.context;
 		// Getting the current user's staff ID
-		fetch('http://localhost:3000/api/v1/staff', {
+		fetch(`${baseUrl}/staff`, {
 			method: 'POST',
 			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
@@ -76,7 +77,7 @@ export class StaffArea extends Component {
 			// Filtering out fields that weren't set
 			if (newLoc[key] !== undefined && newLoc[key] !== '') fields[key] = newLoc[key];
 		});
-		fetch('http://localhost:3000/api/v1/locations', {
+		fetch(`${baseUrl}/locations`, {
 			method: 'POST',
 			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
 			body: JSON.stringify(fields)
@@ -90,7 +91,7 @@ export class StaffArea extends Component {
 					.then(json)
 					.then(location => {
 						// Setting the staff member associated with location
-						fetch(`http://localhost:3000/api/v1/staff`, {
+						fetch(`${baseUrl}/staff`, {
 							method: 'POST',
 							headers: {
 								Authorization: 'Bearer ' + jwt,
@@ -158,7 +159,7 @@ export class StaffArea extends Component {
 	addDog(data, form) {
 		const { jwt } = this.props.context;
 		const { breedId, ...formData } = data;
-		fetch('http://localhost:3000/api/v1/dogs', {
+		fetch(`${baseUrl}/dogs`, {
 			method: 'POST',
 			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
 			body: JSON.stringify(formData)
@@ -206,7 +207,7 @@ export class StaffArea extends Component {
 	 */
 	addBreed(data, form) {
 		const { jwt } = this.props.context;
-		fetch('http://localhost:3000/api/v1/breeds', {
+		fetch(`${baseUrl}/breeds`, {
 			method: 'POST',
 			headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
@@ -226,7 +227,7 @@ export class StaffArea extends Component {
 	 * @param {string} jwt JWT for auth
 	 */
 	getEmptyLocations(jwt) {
-		fetch('http://localhost:3000/api/v1/staff/unstaffed', {
+		fetch(`${baseUrl}/staff/unstaffed`, {
 			headers: { Authorization: 'Bearer ' + jwt }
 		})
 			.then(status)
@@ -240,7 +241,7 @@ export class StaffArea extends Component {
 
 	componentDidMount() {
 		const { jwt } = this.props.context;
-		fetch('http://localhost:3000/api/v1/auth/staff', {
+		fetch(`${baseUrl}/auth/staff`, {
 			headers: { Authorization: 'Bearer ' + jwt }
 		})
 			.then(status)
@@ -265,7 +266,7 @@ export class StaffArea extends Component {
 	 * Gets a list of all breeds.
 	 */
 	getBreeds() {
-		fetch('http://localhost:3000/api/v1/breeds?select=name&limit=0')
+		fetch(`${baseUrl}/breeds?select=name&limit=0`)
 			.then(status)
 			.then(json)
 			.then(data => this.setState({ breeds: data.breeds }))

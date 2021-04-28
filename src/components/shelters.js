@@ -4,6 +4,7 @@ import { Card } from 'antd';
 import SearchList from './searchList';
 import { withRouter } from 'react-router-dom';
 import ShelterListItem from './shelterListItem';
+import { baseUrl } from '../config';
 
 /**
  * Function for fetching data in the search list.
@@ -13,7 +14,7 @@ import ShelterListItem from './shelterListItem';
  * @returns {object} list of breeds in the page and total count
  */
 const getShelters = async (currentPage, pageSize, query, order, direction) => {
-	const url = new URL('http://localhost:3000/api/v1/locations');
+	const url = new URL(`${baseUrl}/locations`);
 	const params = [
 		['select', 'name'],
 		['select', 'address'],

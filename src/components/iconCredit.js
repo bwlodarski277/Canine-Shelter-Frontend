@@ -1,4 +1,4 @@
-import { TwitterOutlined } from '@ant-design/icons';
+import TwitterOutlined from '@ant-design/icons/TwitterOutlined';
 import React from 'react';
 
 const twitter = 'https://twitter.com/CanineShelter';
