@@ -3,6 +3,6 @@ const googleOauth = {
 	clientSecret: '-R73Z9R2HuHvHab2kqTdETMn'
 };
 
-const baseUrl = process.env.API_ROOT || 'http://localhost:3000/api/v1';
+const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/api/v1';
 
 export { googleOauth, baseUrl };
