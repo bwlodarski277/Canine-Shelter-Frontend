@@ -1,4 +1,6 @@
-# Frontend
+# Canine Shelter Frontend
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3bf42866-6194-48b6-9944-3dc06e8a2e49/deploy-status)](https://app.netlify.com/sites/canine-shelter/deploys)
 
 ## **NOTE**
 The frontend often fails to start on Codio due to a lack of memory. It may take a few attempts for the code to start.
