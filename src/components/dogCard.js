@@ -30,7 +30,7 @@ class DogCard extends Component {
 	}
 
 	render() {
-		const { dog } = this.props;
+		const { dog, disableFavs } = this.props;
 		const image = dog.imageUrl ? dog.imageUrl : noImage;
 		const onClick = this.context.loggedIn
 			? this.onClick
@@ -45,15 +45,17 @@ class DogCard extends Component {
 					hoverable
 					style={{ margin: '1em' }}
 					cover={<NavImage alt={dog.name} src={image} to={`/dogs/${dog.id}`} />}
-					actions={[
-						<Favourite
-							key={dog.id}
-							id={dog.id}
-							selected={dog.favourited}
-							count={dog.favourites}
-							onClick={onClick}
-						/>
-					]}
+					actions={
+						!disableFavs && [
+							<Favourite
+								key={dog.id}
+								id={dog.id}
+								selected={dog.favourited}
+								count={dog.favourites}
+								onClick={onClick}
+							/>
+						]
+					}
 				>
 					<Meta title={dog.name} />
 				</Card>
@@ -64,7 +66,8 @@ class DogCard extends Component {
 
 DogCard.propTypes = {
 	dog: PropTypes.object,
-	onClick: PropTypes.func
+	onClick: PropTypes.func,
+	disableFavs: PropTypes.bool
 };
 
 DogCard.contextType = UserContext;
