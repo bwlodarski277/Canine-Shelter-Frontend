@@ -68,8 +68,12 @@ class App extends Component {
 			.then(data => {
 				const { access: jwt, refresh } = data;
 				const { cookies } = this.state;
-				cookies.set('jwt', jwt.token, { path: '/', maxAge: maxAge(jwt.exp) });
-				cookies.set('refresh', refresh.token, { path: '/', maxAge: maxAge(refresh.exp) });
+				cookies.set('jwt', jwt.token, { path: '/', maxAge: maxAge(jwt.exp), secure: true });
+				cookies.set('refresh', refresh.token, {
+					path: '/',
+					maxAge: maxAge(refresh.exp),
+					secure: true
+				});
 				this.loginJwt(jwt.token);
 			})
 			.catch(error);
